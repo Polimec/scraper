@@ -13,6 +13,7 @@
     "@noble/hashes": "^1.8.0",
     "@std/csv": "npm:@jsr/std__csv",
     "@std/encoding": "npm:@jsr/std__encoding",
+    "dedot": "^0.14.1",
     "ky": "^1.8.1"
   }
 }

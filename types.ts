@@ -1,3 +1,5 @@
+import type { BlockHash } from "dedot/codecs";
+
 export type Poliresponse = {
   items: Item[];
   page: number;
@@ -20,7 +22,7 @@ export type Item = {
 
 export type Indexer = {
   blockHeight: number;
-  blockHash: string;
+  blockHash: BlockHash;
   blockTime: number;
   extrinsicIndex: number;
 };

@@ -100,17 +100,28 @@ for (const address of map.keys()) {
   // await sleep(100); // Sleep for 50ms to avoid rate limiting
 }
 
-// Write the result Map to a csv file
-const output_tge = Bun.file(`tge_${PROJECT_ID}.csv`)
+// Write the TGE CSV file with unique accounts only
+const output_tge = Bun.file(`tge_${PROJECT_ID}_v0.csv`)
 const header_tge = "raw_address,polimec_address,polkadot_address,total_account_amount,total_account_vesting\n";
-const csv_content_tge = Array.from(result.entries())
-  .map(([hash, [cleaned, polimec, type, blockHash, blockHeight, blockTime, totalAmount, totalVesting, fasset, fasset_amount, ct]]) => `${cleaned},${polimec},${encodeAddress(decodeAddress(polimec!), 0)},${totalAmount},${totalVesting}`)
-  .join("\n");
+
+// Create a Map to store unique accounts
+const uniqueAccounts = new Map<string, string>();
+Array.from(result.entries()).forEach(([hash, [cleaned, polimec, type, blockHash, blockHeight, blockTime, totalAmount, totalVesting, fasset, fasset_amount, ct]]) => {
+  if (polimec) { // Ensure polimec address exists
+    const accountKey = polimec; // Use polimec address as unique key
+    if (!uniqueAccounts.has(accountKey)) {
+      uniqueAccounts.set(accountKey, `${cleaned},${polimec},${encodeAddress(decodeAddress(polimec), 0)},${totalAmount},${totalVesting}`);
+    }
+  }
+});
+
+const csv_content_tge = Array.from(uniqueAccounts.values()).join("\n");
 await Bun.write(output_tge, header_tge + csv_content_tge);
 console.log(`CSV file created: ${output_tge.name}`);
 
-const output_tax = Bun.file(`tax_${PROJECT_ID}.csv`)
+const output_tax = Bun.file(`tax_${PROJECT_ID}_v0.csv`)
 const header_tax = "raw_address,polimec_address,polkadot_address,extrinsic_type,extrinsic_hash,blockHash,blockHeight,timestamp_in_ms,funding_asset,funding_asset_amount,ct_in_this_extrinsic\n";
+
 const csv_content_tax = Array.from(result.entries())
   .map(([hash, [cleaned, polimec, type, blockHash, blockHeight, blockTime, totalAmount, totalVesting, fasset, fasset_amount, ct]]) => `${cleaned},${polimec},${encodeAddress(decodeAddress(polimec!), 0)},${type},${hash},${blockHash},${blockHeight},${blockTime},${fasset},${fasset_amount},${ct}`)
   .join("\n");

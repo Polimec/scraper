@@ -1,4 +1,4 @@
-# impactscope
+# Scraper
 
 To install dependencies:
 
